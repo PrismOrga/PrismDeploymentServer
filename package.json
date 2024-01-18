@@ -1,0 +1,32 @@
+{
+  "name": "prismdeployementserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier . --write",
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrismOrga/PrismDeployementServer.git"
+  },
+  "author": "Ravriel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PrismOrga/PrismDeployementServer/issues"
+  },
+  "homepage": "https://github.com/PrismOrga/PrismDeployementServer#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "serve-favicon": "^2.5.0",
+    "serve-index": "^1.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

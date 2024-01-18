@@ -1,0 +1,9 @@
+[
+    {
+        "name": "Example",
+        "description": "An example of app to launch with PrismDeployementServer",
+        "entryPoint": "index.js",
+        "autoRestart": false,
+        "status": 0
+    }
+]
