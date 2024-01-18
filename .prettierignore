@@ -1,0 +1,7 @@
+**/.idea
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+**/Microsoft
+**/build
