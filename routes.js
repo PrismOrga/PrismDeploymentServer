@@ -44,6 +44,14 @@ router.post("/start", (req, res) => {
         }
     );
 
+    appChild.on("exit", (code) => {
+        launchedApps.splice(launchedApp, 1);
+
+        apps[app].status = KO;
+
+        fs.writeFileSync(`${__dirname}/data/apps.json`, JSON.stringify(apps));
+    });
+
     launchedApps.push({
         name: apps[app].name,
         child: appChild,
