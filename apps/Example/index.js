@@ -6,11 +6,10 @@ const bodyParser = require("body-parser");
 const serveIndex = require("serve-index");
 const favicon = require("serve-favicon");
 
-const port = process.env.PORT || 22000;
+const port = process.env.PORT || 22222;
 
 global.app = express();
 global.router = express.Router();
-global.launchedApps = new Array();
 
 app.use(morgan("combined"));
 app.use(cors());
@@ -21,9 +20,6 @@ app.use(
     })
 );
 
-app.use(favicon(__dirname + "/public/favicon.ico"));
 app.use(router);
 
 app.listen(port, () => console.log("Server app listening on port " + port));
-
-require("./routes");

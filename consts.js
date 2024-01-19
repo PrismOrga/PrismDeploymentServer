@@ -1,6 +1,6 @@
-export const APP_STATUS = {
+module.exports = {
     OK: 1,
     KO: 84,
-    CRASH: 168,
-    NOT_LAUNCHED: -1,
+    UNKNOWN: -1,
+    NOT_LAUNCHED: 0,
 };
