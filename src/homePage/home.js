@@ -5,62 +5,56 @@ $(document).ready(function () {
 });
 
 function updateList() {
-    const lines = document.getElementById("lines");
-
-    lines.innerHTML = "";
+    let lines = "";
 
     $.ajax({
         type: "GET",
         url: "/apps",
         success: function (data) {
-            let newLine;
-
             console.log(data);
 
             for (const app of data) {
-                newLine = "";
-
-                newLine += `
+                lines += `
                     <td class="column1" id="app-${app.name}">
                         <div class="appcard">
                             ${app.name}`;
 
                 switch (app.status) {
                     case 1:
-                        newLine += `
+                        lines += `
                             <button class="appbutton started" onclick="javascript:stopApp('${app.name}')">
                                 &#x23FC;
                             </button>`;
                         break;
                     case 84:
-                        newLine += `
+                        lines += `
                             <button class="appbutton stopped" onclick="javascript:startApp('${app.name}')">
                                 &#x23FC;
                             </button>`;
                         break;
                     case -1:
-                        newLine += `
+                        lines += `
                             <button class="appbutton unknown" onclick="javascript:startApp('${app.name}')">
                                 &#x23FC;
                             </button>`;
                         break;
                     default:
-                        newLine += `
+                        lines += `
                             <button class="appbutton disabled" onclick="javascript:startApp('${app.name}')" disabled>
                                 &#x23FC;
                             </button>`;
                         break;
                 }
 
-                newLine += `
+                lines += `
                             <br />
                             <br />
                             ${app.description}
                         </div>
                     </td>`;
-
-                lines.innerHTML += newLine;
             }
+
+            document.getElementById("lines").innerHTML = lines;
         },
     });
 }
