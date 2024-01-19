@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    // updateList();
+    updateList();
 
-    setInterval(updateList(), 10000);
+    setInterval(updateList, 10000);
 });
 
 function updateList() {
