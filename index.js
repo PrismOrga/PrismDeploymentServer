@@ -14,12 +14,16 @@ if (!fs.existsSync(`${__dirname}/data/logs`))
     fs.mkdirSync(`${__dirname}/data/logs`);
 if (!fs.existsSync(`${__dirname}/apps`)) fs.mkdirSync(`${__dirname}/apps`);
 
-let apps = JSON.parse(fs.readFileSync(`${__dirname}/data/apps.json`, { encoding: "utf-8" }))
+let apps = JSON.parse(
+    fs.readFileSync(`${__dirname}/data/apps.json`, { encoding: "utf-8" })
+);
 
 for (let app = 0; app < apps.length; app++) {
     if (!fs.existsSync(`${__dirname}/${apps[app].location}`)) {
         apps[app].status = -1;
-        console.error(`ERROR: ${apps[app].location}: no such file or directory.`);
+        console.error(
+            `ERROR: ${apps[app].location}: no such file or directory.`
+        );
     }
 }
 
