@@ -29,10 +29,10 @@ module.exports = {
             );
 
             logFile += `Exited with code: ${0}`;
+            if (!FS.existsSync(`${ROOTFOLDER}/server/data/logs/_old/${apps[app].name}`))
+                FS.mkdirSync(`${ROOTFOLDER}/server/data/logs/_old/${apps[app].name}`);
             FS.writeFileSync(
-                `${ROOTFOLDER}/server/data/logs/_old/${
-                    apps[app].name
-                }-${new Date().toDateString()}.console.log`,
+                `${ROOTFOLDER}/server/data/logs/_old/${apps[app].name}/${new Date().toLocaleString().replaceAll("/", "-").replace(", ", " ").replaceAll(" ", "_").replaceAll(":", "-")}.console.log`,
                 logFile
             );
             FS.rmSync(
