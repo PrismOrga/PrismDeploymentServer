@@ -1,1 +1,0 @@
-[{"name":"Example","description":"An example of app to launch with PrismDeployementServer","location":"apps/Example","entryPoint":"index.js","launchScript":{"command":"npm","args":["run","start"]},"autoRestart":false,"status":84}]
