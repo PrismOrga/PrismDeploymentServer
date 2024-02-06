@@ -1,7 +1,8 @@
-const { OK, KO, UNKNOWN, NOT_LAUNCHED } = require("./consts");
 const express = require("express");
 const fs = require("fs");
 const child = require("child_process");
+
+const { OK, KO, UNKNOWN, NOT_LAUNCHED } = require("./consts");
 
 router.get("/", (req, res) => {
     app.use(express.static(`${__dirname}/public`));
