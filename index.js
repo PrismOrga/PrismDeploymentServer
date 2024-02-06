@@ -1,6 +1,7 @@
 global.EXPRESS = require("express");
 global.FS = require("fs");
 
+const https = require("https");
 const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
@@ -56,6 +57,21 @@ APP.use(
 APP.use(favicon(ROOTFOLDER + "/client/public/favicon.ico"));
 APP.use(ROUTER);
 
-APP.listen(port, () => console.log("Server app listening on port " + port));
+const privateKey = FS.readFileSync(`${ROOTFOLDER}/private/privkey.pem`);
+const certificate = FS.readFileSync(`${ROOTFOLDER}/private/cert.pem`);
+
+if (!certificate || !privateKey) {
+    throw new Error("FATAL ERROR: NO CERTIFICATE/PRIVATE KEY FOUND");
+}
+
+const server = https
+    .createServer(
+        {
+            key: privateKey,
+            cert: certificate,
+        },
+        APP
+    )
+    .listen(port, () => console.log("Server app listening on port " + port));
 
 require("./routes");
