@@ -5,9 +5,9 @@ const child = require("child_process");
 const { OK, KO, UNKNOWN, NOT_LAUNCHED } = require("./consts");
 
 router.get("/", (req, res) => {
-    app.use(express.static(`${__dirname}/public`));
-    app.use(express.static(`${__dirname}/src/homePage`));
-    res.sendFile(`${__dirname}/src/homePage/home.html`);
+    app.use(express.static(`${__dirname}/client/public`));
+    app.use(express.static(`${__dirname}/client/src/homePage`));
+    res.sendFile(`${__dirname}/client/src/homePage/home.html`);
 });
 
 router.get("/apps", (req, res) => {
@@ -41,16 +41,80 @@ router.post("/start", (req, res) => {
         apps[app].launchScript.command,
         apps[app].launchScript.args,
         {
-            cwd: `${__dirname}/${apps[app].location}`,
+            cwd:
+                apps[app].location[0] == "/"
+                    ? `${apps[app].location}`
+                    : `${__dirname}/${apps[app].location}`,
         }
     );
+
+    appChild.stdout.on("data", (data) => {
+        if (
+            !fs.existsSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            )
+        )
+            fs.writeFileSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`,
+                ""
+            );
+
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += data;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`,
+            logFile
+        );
+    });
+
+    appChild.stderr.on("data", (data) => {
+        if (
+            !fs.existsSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            )
+        )
+            fs.writeFileSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`,
+                ""
+            );
+
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += data;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`,
+            logFile
+        );
+    });
 
     appChild.on("exit", (code) => {
         launchedApps.splice(launchedApp, 1);
 
-        apps[app].status = KO;
+        apps[app].status = UNKNOWN;
 
         fs.writeFileSync(`${__dirname}/data/apps.json`, JSON.stringify(apps));
+
+        if (
+            fs.existsSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            )
+        ) {
+            let logFile = fs.readFileSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            );
+
+            logFile += `Exited with code: ${code}`;
+            fs.writeFileSync(
+                `${__dirname}/data/logs/_old/${apps[app].name}.console.log`,
+                logFile
+            );
+            fs.rmSync(`${__dirname}/data/logs/${apps[app].name}.console.log`);
+        }
     });
 
     launchedApps.push({
@@ -86,13 +150,35 @@ router.post("/stop", (req, res) => {
     }
     if (launchedApp === launchedApps.length) return res.sendStatus(400);
 
-    process.kill(launchedApps[launchedApp].child.pid);
+    switch (apps[app].closeProcess) {
+        case "KILL":
+            process.kill(launchedApps[launchedApp].child.pid, "SIGTERM");
+            break;
+        case "RCON":
+            console.info("TODO: RCON EXIT");
+            break;
+        default:
+            console.info("TODO: CUSTOM EXIT");
+    }
 
     launchedApps.splice(launchedApp, 1);
 
     apps[app].status = KO;
 
     fs.writeFileSync(`${__dirname}/data/apps.json`, JSON.stringify(apps));
+
+    if (fs.existsSync(`${__dirname}/data/logs/${apps[app].name}.console.log`)) {
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += `Exited with code: ${0}`;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/_old/${apps[app].name}.console.log`,
+            logFile
+        );
+        fs.rmSync(`${__dirname}/data/logs/${apps[app].name}.console.log`);
+    }
 
     return res.sendStatus(200);
 });

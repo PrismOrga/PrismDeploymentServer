@@ -143,6 +143,7 @@ table tbody {
     display: block;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-top: 5px;
 }
 
 table tbody tr {
@@ -217,6 +218,11 @@ tbody td:hover {
     background-color: transparent;
     font-size: 14pt;
     border-radius: 100%;
+}
+
+.appbutton svg {
+    top: 3px;
+    left: 2px;
 }
 
 .appbutton.disabled {

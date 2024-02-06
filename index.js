@@ -12,6 +12,8 @@ if (!fs.existsSync(`${__dirname}/data/apps.json`))
     fs.writeFileSync(`${__dirname}/data/apps.json`, "[]");
 if (!fs.existsSync(`${__dirname}/data/logs`))
     fs.mkdirSync(`${__dirname}/data/logs`);
+if (!fs.existsSync(`${__dirname}/data/logs/_old`))
+    fs.mkdirSync(`${__dirname}/data/logs/_old`);
 if (!fs.existsSync(`${__dirname}/apps`)) fs.mkdirSync(`${__dirname}/apps`);
 
 let apps = JSON.parse(
@@ -19,10 +21,12 @@ let apps = JSON.parse(
 );
 
 for (let app = 0; app < apps.length; app++) {
-    if (!fs.existsSync(`${__dirname}/${apps[app].location}`)) {
+    let appPath = apps[app].location[0] == "/" ? `${apps[app].location}` : `${__dirname}/${apps[app].location}`;
+
+    if (!fs.existsSync(appPath)) {
         apps[app].status = -1;
         console.error(
-            `ERROR: ${apps[app].location}: no such file or directory.`
+            `ERROR: ${appPath}: no such file or directory.`
         );
     }
 }
@@ -42,7 +46,7 @@ app.use(
     })
 );
 
-app.use(favicon(__dirname + "/public/favicon.ico"));
+app.use(favicon(__dirname + "/client/public/favicon.ico"));
 app.use(router);
 
 app.listen(port, () => console.log("Server app listening on port " + port));
