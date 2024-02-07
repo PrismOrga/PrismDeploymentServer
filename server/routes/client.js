@@ -1,9 +1,9 @@
 ROUTER.get("/", (req, res) => {
-    APP.use(EXPRESS.static(`${ROOTFOLDER}/client/public`));
-    APP.use(EXPRESS.static(`${ROOTFOLDER}/client/src/homePage`));
-    res.sendFile(`${ROOTFOLDER}/client/src/homePage/home.html`);
+    APP.use(EXPRESS.static(`${CLIENT_ROOTFOLDER}/src/homePage`));
+    APP.use(EXPRESS.static(`${CLIENT_ROOTFOLDER}/public`));
+    res.sendFile(`${CLIENT_ROOTFOLDER}/src/homePage/home.html`);
 });
 
 ROUTER.get("/apps", (req, res) => {
-    res.sendFile(`${ROOTFOLDER}/server/data/apps.json`);
+    res.sendFile(`${SERVER_ROOTFOLDER}/data/apps.json`);
 });

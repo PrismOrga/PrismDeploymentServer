@@ -1,8 +1,11 @@
-const { getAppIndexByName, finaliseExit } = require("../appsManagement");
+const {
+    getAppIndexByName,
+    finaliseExit,
+} = require(`${SERVER_ROOTFOLDER}/appsManagement`);
 
 ROUTER.post("/stop", (req, res) => {
     const apps = JSON.parse(
-        FS.readFileSync(`${ROOTFOLDER}/server/data/apps.json`, {
+        FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",
         })
     );

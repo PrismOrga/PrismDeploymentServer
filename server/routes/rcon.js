@@ -1,8 +1,11 @@
-const { sendAppRCONCommand, getAppIndexByName } = require("../appsManagement");
+const {
+    sendAppRCONCommand,
+    getAppIndexByName,
+} = require(`${SERVER_ROOTFOLDER}/appsManagement`);
 
 ROUTER.get("/rcon", (req, res) => {
     const apps = JSON.parse(
-        FS.readFileSync(`${ROOTFOLDER}/server/data/apps.json`, {
+        FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",
         })
     );

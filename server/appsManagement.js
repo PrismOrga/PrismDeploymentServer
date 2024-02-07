@@ -1,6 +1,6 @@
-const { handleData } = require("./stdDataHandler");
+const { appStatus } = require(`${ROOTFOLDER}/conf`);
 
-const { OK, KO, UNKNOWN, NOT_LAUNCHED } = require(`${ROOTFOLDER}/consts`);
+const { handleData } = require(`${SERVER_ROOTFOLDER}/stdDataHandler`);
 
 function getCurrentLocaleFormattedDate() {
     return new Date()
@@ -23,39 +23,39 @@ module.exports = {
     finaliseExit(apps, app, launchedApp) {
         LAUNCHED_APPS.splice(launchedApp, 1);
 
-        apps[app].status = KO;
+        apps[app].status = appStatus.KO;
 
         FS.writeFileSync(
-            `${ROOTFOLDER}/server/data/apps.json`,
+            `${SERVER_ROOTFOLDER}/data/apps.json`,
             JSON.stringify(apps)
         );
 
         if (
             FS.existsSync(
-                `${ROOTFOLDER}/server/data/logs/${apps[app].name}.console.log`
+                `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             )
         ) {
             let logFile = FS.readFileSync(
-                `${ROOTFOLDER}/server/data/logs/${apps[app].name}.console.log`
+                `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             );
 
             logFile += `Exited with code: ${0}`;
             if (
                 !FS.existsSync(
-                    `${ROOTFOLDER}/server/data/logs/_old/${apps[app].name}`
+                    `${SERVER_ROOTFOLDER}/data/logs/_old/${apps[app].name}`
                 )
             )
                 FS.mkdirSync(
-                    `${ROOTFOLDER}/server/data/logs/_old/${apps[app].name}`
+                    `${SERVER_ROOTFOLDER}/data/logs/_old/${apps[app].name}`
                 );
             FS.writeFileSync(
-                `${ROOTFOLDER}/server/data/logs/_old/${
+                `${SERVER_ROOTFOLDER}/data/logs/_old/${
                     apps[app].name
                 }/${getCurrentLocaleFormattedDate()}.console.log`,
                 logFile
             );
             FS.rmSync(
-                `${ROOTFOLDER}/server/data/logs/${apps[app].name}.console.log`
+                `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             );
         }
     },
@@ -64,11 +64,11 @@ module.exports = {
         let currentCommandFilename = getCurrentLocaleFormattedDate();
         let rconChild = null;
 
-        if (!FS.existsSync(`${ROOTFOLDER}/server/temp`))
-            FS.mkdirSync(`${ROOTFOLDER}/server/temp`);
+        if (!FS.existsSync(`${SERVER_ROOTFOLDER}/temp`))
+            FS.mkdirSync(`${SERVER_ROOTFOLDER}/temp`);
 
         FS.writeFileSync(
-            `${ROOTFOLDER}/server/temp/${currentCommandFilename}`,
+            `${SERVER_ROOTFOLDER}/temp/${currentCommandFilename}`,
             command
         );
 
@@ -80,7 +80,7 @@ module.exports = {
             "--pass",
             rcon.pass,
             "--file",
-            `${ROOTFOLDER}/server/temp/${currentCommandFilename}`,
+            `${SERVER_ROOTFOLDER}/temp/${currentCommandFilename}`,
         ]);
 
         rconChild.stdout.on("data", (data) => {

@@ -1,11 +1,14 @@
-const { finaliseExit, getAppIndexByName } = require("../appsManagement");
-const { handleData } = require("../stdDataHandler");
+const { appStatus } = require(`${ROOTFOLDER}/conf`);
 
-const { OK, KO, UNKNOWN, NOT_LAUNCHED } = require(`${ROOTFOLDER}/consts`);
+const {
+    finaliseExit,
+    getAppIndexByName,
+} = require(`${SERVER_ROOTFOLDER}/appsManagement`);
+const { handleData } = require(`${SERVER_ROOTFOLDER}/stdDataHandler`);
 
 ROUTER.post("/start", (req, res) => {
     const apps = JSON.parse(
-        FS.readFileSync(`${ROOTFOLDER}/server/data/apps.json`, {
+        FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",
         })
     );
@@ -13,7 +16,10 @@ ROUTER.post("/start", (req, res) => {
     let appChild = null;
 
     if (!apps[app]) return res.sendStatus(404);
-    if (apps[app].status === OK || apps[app].status === NOT_LAUNCHED)
+    if (
+        apps[app].status === appStatus.OK ||
+        apps[app].status === appStatus.NOT_LAUNCHED
+    )
         return res.sendStatus(400);
 
     appChild = CHILD.spawn(
@@ -23,7 +29,7 @@ ROUTER.post("/start", (req, res) => {
             cwd:
                 apps[app].location[0] == "/"
                     ? `${apps[app].location}`
-                    : `${ROOTFOLDER}/${apps[app].location}`,
+                    : `${APPS_ROOTFOLDER}/${apps[app].location}`,
         }
     );
 
@@ -32,17 +38,17 @@ ROUTER.post("/start", (req, res) => {
         child: appChild,
     });
 
-    apps[app].status = OK;
+    apps[app].status = appStatus.OK;
 
     let launchedApp = getAppIndexByName(LAUNCHED_APPS, apps[app].name);
 
     if (
         FS.existsSync(
-            `${ROOTFOLDER}/server/data/logs/${apps[app].name}.console.log`
+            `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
         )
     )
         FS.rmSync(
-            `${ROOTFOLDER}/server/data/logs/${apps[app].name}.console.log`
+            `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
         );
 
     appChild.stdout.on("data", (data) => {
@@ -58,7 +64,7 @@ ROUTER.post("/start", (req, res) => {
     });
 
     FS.writeFileSync(
-        `${ROOTFOLDER}/server/data/apps.json`,
+        `${SERVER_ROOTFOLDER}/data/apps.json`,
         JSON.stringify(apps)
     );
 
