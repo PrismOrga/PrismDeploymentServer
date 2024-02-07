@@ -10,4 +10,23 @@ module.exports = {
         certificate: "./private/cert.pem",
         privateKey: "./private/privkey.pem",
     },
+
+    build: {
+        auto: false,
+        folders: ["client/src"],
+        exeptions: [
+            {
+                fileExtension: "html",
+                characters: [" ", ">"]
+            },
+            {
+                fileExtension: "css",
+                characters: [" ", ";", ",", "}", "{"]
+            },
+            {
+                fileExtension: "js",
+                characters: [" ", ";", ",", "\"", "'", "`", "(", "{", "}"]
+            }
+        ]
+    }
 };

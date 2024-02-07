@@ -7,15 +7,17 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const favicon = require("serve-favicon");
 
-const port = process.env.PORT || 22000;
-
 global.ROOTFOLDER = __dirname;
 
 const config = require(`${ROOTFOLDER}/conf`);
+const port = config.port || 22000;
+
+if (config.build.auto) require("./build");
 
 global.APPS_ROOTFOLDER = `${ROOTFOLDER}/apps`;
 global.CLIENT_ROOTFOLDER = `${ROOTFOLDER}/client`;
 global.SERVER_ROOTFOLDER = `${ROOTFOLDER}/server`;
+global.BUILD_ROOTFOLDER = `${ROOTFOLDER}/build`;
 
 if (!FS.existsSync(`${APPS_ROOTFOLDER}`)) FS.mkdirSync(`${APPS_ROOTFOLDER}`);
 if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data`))
@@ -90,6 +92,8 @@ const server = https
         },
         APP
     )
-    .listen(port, () => console.log(`Server app listening on port ${port}`));
+    .listen(port, () =>
+        console.log(`\x1B[36mServer app listening on port ${port}\x1B[0m`)
+    );
 
 require("./routes");

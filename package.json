@@ -5,8 +5,9 @@
     "main": "index.js",
     "scripts": {
         "format": "prettier . --write",
-        "start": "nodemon index.js --ignore ./apps --ignore ./server/data",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "nodemon index.js --ignore ./apps --ignore ./server/data --ignore build",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "node build.js"
     },
     "repository": {
         "type": "git",
