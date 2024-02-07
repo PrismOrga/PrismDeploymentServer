@@ -97,5 +97,11 @@ module.exports = {
                 `RCON: Couldn't send RCON command:\n${error}`
             );
         });
+
+        return new Promise((resolve) => {
+            rconChild.on("close", (code) => {
+                resolve(code);
+            });
+        });
     },
 };

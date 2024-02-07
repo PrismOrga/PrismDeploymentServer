@@ -1,7 +1,10 @@
 <html id="page">
     <head>
         <title>PDS - Home</title>
-        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="upgrade-insecure-requests"
+        />
         <link href="home.css" rel="stylesheet" />
         <link rel="shortcut icon" href="favicon.ico?v=2" />
         <script
@@ -22,6 +25,40 @@
                                 </tr>
                             </thead>
                             <tbody id="lines" style="height: 70vh"></tbody>
+                        </table>
+                        <table>
+                            <thead>
+                                <tr class="table100-head">
+                                    <th class="column1">Console</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                id="console-lines"
+                                style="height: 70vh"
+                            ></tbody>
+                            <tfoot>
+                                <tr class="table100-foot">
+                                    <th class="column1">
+                                        <select
+                                            name="console"
+                                            id="console-select"
+                                            dir="rtl"
+                                        >
+                                            <option value="bash">Bash</option>
+                                            <option value="rcon">RCON</option>
+                                        </select>
+                                        $>
+                                        <input
+                                            id="console-command"
+                                            placeholder="Type a command to send"
+                                            style="
+                                                width: 1000px;
+                                                margin-left: 5px;
+                                            "
+                                        />
+                                    </th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

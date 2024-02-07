@@ -154,6 +154,16 @@ table tbody tr:last-child {
     border: 0;
 }
 
+table tfoot {
+    display: block;
+    background: #36304a;
+}
+
+table tfoot tr {
+    height: 60px;
+    background: #36304a;
+}
+
 table td,
 table th {
     text-align: left;
@@ -174,7 +184,22 @@ table th.r {
     text-align: center;
 }
 
-.table100-head th {
+table td select,
+table th select,
+table td input,
+table th input {
+    background: #36304a;
+    border-color: #36304a;
+    font-family: OpenSans-Regular;
+    font-size: 18px;
+    color: #fff;
+    line-height: 1.2;
+    font-weight: unset;
+}
+
+.table100-head th,
+.table100-foot th {
+    width: fit-content;
     font-family: OpenSans-Regular;
     font-size: 18px;
     color: #fff;
@@ -231,6 +256,15 @@ tbody td:hover {
 
 .appbutton.started {
     color: #15ff00;
+}
+
+.appbutton.switching {
+    animation: switching 1s infinite alternate;
+}
+
+@keyframes switching {
+	from {color: #15ff004d;}
+	to {color: #15ff00;}
 }
 
 .appbutton.stopped {

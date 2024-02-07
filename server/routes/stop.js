@@ -1,9 +1,11 @@
+const { sendAppRCONCommand } = require("../appsManagement");
+
 const {
     getAppIndexByName,
     finaliseExit,
 } = require(`${SERVER_ROOTFOLDER}/appsManagement`);
 
-ROUTER.post("/stop", (req, res) => {
+ROUTER.post("/stop", async (req, res) => {
     const apps = JSON.parse(
         FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",
@@ -21,8 +23,9 @@ ROUTER.post("/stop", (req, res) => {
             finaliseExit(apps, app, launchedApp);
             break;
         case "RCON":
-            console.info("TODO: RCON EXIT");
-            break;
+            return res
+                .status(403)
+                .json({ closeCommand: apps[app].rcon.closeCommand });
         default:
             console.info("TODO: CUSTOM EXIT");
     }

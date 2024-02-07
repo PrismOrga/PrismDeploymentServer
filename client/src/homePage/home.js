@@ -1,4 +1,13 @@
+shutdownings = [];
+appInConsole = null;
+
 $(document).ready(function () {
+    $("input").on("keydown", function search(e) {
+        if (e.keyCode == 13) {
+            consoleCommand($(this).val(), this);
+        }
+    });
+
     updateList();
 
     setInterval(updateList, 10000);
@@ -20,7 +29,11 @@ function updateList() {
                 switch (app.status) {
                     case 1:
                         lines += `
-                            <button class="appbutton started" onclick="javascript:stopApp('${app.name}')">
+                            <button class="appbutton ${
+                                shutdownings.includes(app.name)
+                                    ? `switching" disabled`
+                                    : `started" onclick="javascript:stopApp('${app.name}')"`
+                            }>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16"><title>Stop</title><path d="M7.5 1v7h1V1h-1z"/><path d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/></svg>
                             </button>
                             <button class="appbutton">
@@ -75,6 +88,8 @@ function startApp(appName) {
         url: "start",
         data: { appName: appName },
         success: () => {
+            if (shutdownings.includes(appName))
+                shutdownings.splice(shutdownings.indexOf(appName), 1);
             setTimeout(updateList(), 1000);
         },
         error: function (err) {
@@ -92,7 +107,48 @@ function stopApp(appName) {
             setTimeout(updateList(), 1000);
         },
         error: function (err) {
+            if (err.responseText) {
+                const closeCommand = JSON.parse(err.responseText).closeCommand;
+                let i = null;
+                if (
+                    closeCommand &&
+                    (i = consoleCommand(closeCommand, null, "rcon", appName))
+                ) {
+                    shutdownings.push(appName);
+                    return;
+                }
+                console.log(i);
+            }
             throw new Error(err);
         },
     });
 }
+
+function consoleCommand(command, _input, _consoleType, _appName) {
+    const consoleType =
+        _consoleType || document.getElementById("console-select").value;
+
+    if (command == "") return false;
+    if (
+        shutdownings.includes(_appName) ||
+        (appInConsole ? shutdownings.includes(appInConsole.name) : false)
+    )
+        return false;
+    if (_input) _input.value = "";
+
+    return $.ajax({
+        type: "POST",
+        url: consoleType,
+        data: { appName: _appName || appInConsole.name, rconCommand: command },
+        success: () => {
+            setTimeout(updateList(), 1000);
+            return true;
+        },
+        error: function (err) {
+            console.error(new Error(err));
+            return false;
+        },
+    });
+}
+
+// TODO : select app to open console ; send command to server ; update logs quickly
