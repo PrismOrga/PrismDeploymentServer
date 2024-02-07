@@ -14,7 +14,7 @@ ROUTER.post("/rcon", async (req, res) => {
         apps[getAppIndexByName(apps, req.body.appName)].rcon,
         req.body.rconCommand
     );
-console.log(commandExitCode, commandExitCode == 0, commandExitCode === 0);
+
     if (commandExitCode === 0) return res.sendStatus(200);
 
     return res.sendStatus(500);

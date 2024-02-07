@@ -143,7 +143,11 @@ table tbody {
     display: block;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-top: 5px;
+    padding: 5px;
+}
+
+table tbody#console-lines {
+    background: #000;
 }
 
 table tbody tr {

@@ -18,7 +18,7 @@
             <div class="container-table100">
                 <div class="wrap-table100">
                     <div class="table100">
-                        <table>
+                        <table id="apps">
                             <thead>
                                 <tr class="table100-head">
                                     <th class="column1">Applications</th>
@@ -26,10 +26,21 @@
                             </thead>
                             <tbody id="lines" style="height: 70vh"></tbody>
                         </table>
-                        <table>
+                        <table id="console" hidden>
                             <thead>
                                 <tr class="table100-head">
-                                    <th class="column1">Console</th>
+                                    <th class="column1">
+                                        <p
+                                            onclick="javascript:switchApps()"
+                                            style="
+                                                cursor: pointer;
+                                                display: inline;
+                                            "
+                                        >
+                                            &lt;
+                                        </p>
+                                        Console
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody
