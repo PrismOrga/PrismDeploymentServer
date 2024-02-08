@@ -91,6 +91,43 @@ iframe {
     background: linear-gradient(45deg, #4158d0, #c850c0);
 }
 
+#nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 50px;
+    background: #36304a;
+    color: #fff;
+    padding: 5px;
+}
+
+#nav .nav-title {
+    margin-left: 5px;
+}
+
+#nav .nav-buttons {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+#nav .nav-button {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    color: #fff;
+    padding: 0 8px;
+    transition: 0.2s;
+}
+
+#nav .nav-button:hover {
+    background: #ffffff18;
+    transition: 0.2s;
+}
+
 .container-table100 {
     width: 100%;
     min-height: 100vh;
@@ -267,8 +304,12 @@ tbody td:hover {
 }
 
 @keyframes switching {
-	from {color: #15ff004d;}
-	to {color: #15ff00;}
+    from {
+        color: #15ff004d;
+    }
+    to {
+        color: #15ff00;
+    }
 }
 
 .appbutton.stopped {

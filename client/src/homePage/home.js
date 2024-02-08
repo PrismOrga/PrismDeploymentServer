@@ -9,6 +9,11 @@ $(document).ready(function () {
         }
     });
 
+    const logInOutButton = document.getElementById("login-logout-button");
+
+    if (!getCookie("accessToken")) logInOutButton.innerHTML = "<h3>Login</h3>";
+    else logInOutButton.innerHTML = "<h3>Logout</h3>";
+
     updateList();
 
     setInterval(updateList, 10000);
@@ -22,7 +27,7 @@ function updateList() {
         type: "GET",
         url: "/apps",
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: function (data) {
             for (const app of data) {
@@ -94,7 +99,7 @@ function updateLog() {
         url: "/currentLog",
         data: { appName: appInConsole },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: function (data) {
             document.getElementById("console-lines").innerHTML =
@@ -109,7 +114,7 @@ function startApp(appName) {
         url: "/start",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: () => {
             if (shutdownings.includes(appName))
@@ -128,7 +133,7 @@ function stopApp(appName) {
         url: "/stop",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: () => {
             setTimeout(updateList(), 1000);
@@ -156,7 +161,7 @@ function switchAutoRestart(appName) {
         url: "/autorestart",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: () => {
             setTimeout(updateList(), 1000);
@@ -199,7 +204,7 @@ function consoleCommand(command, _input, _consoleType, _appName) {
         url: consoleType,
         data: { appName: _appName || appInConsole, rconCommand: command },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
         },
         success: () => {
             setTimeout(updateLog(), 1000);
@@ -212,20 +217,11 @@ function consoleCommand(command, _input, _consoleType, _appName) {
     });
 }
 
-function getAuthToken() {
-    const name = "accessToken=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(";");
-
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-
-        while (c.charAt(0) == " ") {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
+function logInOut() {
+    if (!getCookie("accessToken")) {
+        window.location.href = "/login";
+    } else {
+        deleteCookie("accessToken")
+        window.location.reload();
     }
-    return "";
 }

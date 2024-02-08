@@ -9,7 +9,7 @@ function authMe() {
         url: "/login",
         data: { username: username, password: password },
         success: (data) => {
-            document.cookie = `accessToken=${data.accessToken}`;
+            setCookie("accessToken", data.accessToken, { secure: true });
             window.location.href = "/";
         },
         error: function (err) {

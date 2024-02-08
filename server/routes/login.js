@@ -21,11 +21,3 @@ ROUTER.post("/login", (req, res) => {
         return res.sendStatus(401);
     }
 });
-
-ROUTER.post('/logout', (req, res) => {
-    const { token } = req.body;
-    refreshTokens = refreshTokens.filter(token => t !== token);
-
-    return res.sendStatus(200);
-});
-
