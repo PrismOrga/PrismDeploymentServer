@@ -31,14 +31,14 @@ mkdirSync(`build`);
 
 switch (config.build.folders.length) {
     case 0:
-        console.info(`\x1B[33m[build] no folder to build\x1B[0m`);
+        console.info(`\x1B[33m[build] no folder to build\x1B[39m`);
         break;
     case 1:
-        console.info(`\x1B[33m[build] building 1 folder...\x1B[0m`);
+        console.info(`\x1B[33m[build] building 1 folder...\x1B[39m`);
         break;
     default:
         console.info(
-            `\x1B[33m[build] building ${config.build.folders.length} folder...\x1B[0m`
+            `\x1B[33m[build] building ${config.build.folders.length} folder...\x1B[39m`
         );
         break;
 }

@@ -106,7 +106,7 @@ const server = https
         APP
     )
     .listen(port, () =>
-        console.log(`\x1B[36mServer app listening on port ${port}\x1B[0m`)
+        console.log(`\x1B[36mServer app listening on port ${port}\x1B[39m`)
     );
 
 require("./routes");
