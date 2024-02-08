@@ -7,8 +7,12 @@ module.exports = {
     },
 
     ssl: {
-        certificate: "./private/cert.pem",
-        privateKey: "./private/privkey.pem",
+        certificate: "private/cert.pem",
+        privateKey: "private/privkey.pem",
+    },
+
+    jwt: {
+        privateKey: "private/jwtpriv.key",
     },
 
     build: {
@@ -17,16 +21,16 @@ module.exports = {
         exeptions: [
             {
                 fileExtension: "html",
-                characters: [" ", ">"]
+                characters: [" ", ">"],
             },
             {
                 fileExtension: "css",
-                characters: [" ", ";", ",", "}", "{"]
+                characters: [" ", ";", ",", "}", "{"],
             },
             {
                 fileExtension: "js",
-                characters: [" ", ";", ",", "\"", "'", "`", "(", "{", "}"]
-            }
-        ]
-    }
+                characters: [" ", ";", ",", '"', "'", "`", "(", "{", "}"],
+            },
+        ],
+    },
 };

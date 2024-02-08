@@ -1,6 +1,7 @@
 global.CHILD = require("child_process");
 
-require("./server/routes/client");
-require("./server/routes/start");
-require("./server/routes/stop");
-require("./server/routes/rcon");
+require(`${SERVER_ROOTFOLDER}/routes/client`);
+require(`${SERVER_ROOTFOLDER}/routes/start`);
+require(`${SERVER_ROOTFOLDER}/routes/stop`);
+require(`${SERVER_ROOTFOLDER}/routes/rcon`);
+require(`${SERVER_ROOTFOLDER}/routes/login`);

@@ -2,8 +2,9 @@ const {
     sendAppRCONCommand,
     getAppIndexByName,
 } = require(`${SERVER_ROOTFOLDER}/appsManagement`);
+const { authenticateJWT } = require(`${SERVER_ROOTFOLDER}/jwtAuthChecker`);
 
-ROUTER.post("/rcon", async (req, res) => {
+ROUTER.post("/rcon", authenticateJWT, async (req, res) => {
     const apps = JSON.parse(
         FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",

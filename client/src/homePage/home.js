@@ -1,6 +1,6 @@
-shutdownings = [];
-appInConsole = null;
-isConsoleOpen = false;
+let shutdownings = [];
+let appInConsole = null;
+let isConsoleOpen = false;
 
 $(document).ready(function () {
     $("input").on("keydown", function search(e) {
@@ -21,6 +21,9 @@ function updateList() {
     $.ajax({
         type: "GET",
         url: "/apps",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+        },
         success: function (data) {
             for (const app of data) {
                 lines += `
@@ -92,6 +95,9 @@ function updateLog() {
         type: "POST",
         url: "/currentLog",
         data: { appName: appInConsole },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+        },
         success: function (data) {
             document.getElementById("console-lines").innerHTML =
                 data.lines.replaceAll("\n", "<br />");
@@ -104,6 +110,9 @@ function startApp(appName) {
         type: "POST",
         url: "start",
         data: { appName: appName },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+        },
         success: () => {
             if (shutdownings.includes(appName))
                 shutdownings.splice(shutdownings.indexOf(appName), 1);
@@ -120,6 +129,9 @@ function stopApp(appName) {
         type: "POST",
         url: "stop",
         data: { appName: appName },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+        },
         success: () => {
             setTimeout(updateList(), 1000);
         },
@@ -134,7 +146,6 @@ function stopApp(appName) {
                     shutdownings.push(appName);
                     return;
                 }
-                console.log(i);
             }
             throw new Error(err);
         },
@@ -172,6 +183,9 @@ function consoleCommand(command, _input, _consoleType, _appName) {
         type: "POST",
         url: consoleType,
         data: { appName: _appName || appInConsole, rconCommand: command },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + getAuthToken());
+        },
         success: () => {
             setTimeout(updateLog(), 1000);
             return true;
@@ -181,4 +195,22 @@ function consoleCommand(command, _input, _consoleType, _appName) {
             return false;
         },
     });
+}
+
+function getAuthToken() {
+    const name = "accessToken=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(";");
+
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+
+        while (c.charAt(0) == " ") {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

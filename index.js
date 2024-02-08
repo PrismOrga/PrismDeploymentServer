@@ -1,5 +1,6 @@
 global.EXPRESS = require("express");
 global.FS = require("fs");
+global.JWT = require("jsonwebtoken");
 
 const https = require("https");
 const cors = require("cors");
@@ -24,10 +25,22 @@ if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data`))
     FS.mkdirSync(`${SERVER_ROOTFOLDER}/data`);
 if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data/apps.json`))
     FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, "[]");
+if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data/users.json`))
+    FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/users.json`, "[]");
 if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data/logs`))
     FS.mkdirSync(`${SERVER_ROOTFOLDER}/data/logs`);
 if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data/logs/_old`))
     FS.mkdirSync(`${SERVER_ROOTFOLDER}/data/logs/_old`);
+if (!FS.existsSync(config.jwt.privateKey))
+    throw new Error(
+        `FATAL ERROR: ${config.jwt.privateKey}: no such file or directory.`
+    );
+
+global.JWT_PRIVATE_KEY = FS.readFileSync(
+    config.jwt.privateKey[0] == "/"
+        ? config.jwt.privateKey
+        : `${ROOTFOLDER}/${config.jwt.privateKey}`
+);
 
 let apps = JSON.parse(
     FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {

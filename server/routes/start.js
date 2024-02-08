@@ -5,8 +5,9 @@ const {
     getAppIndexByName,
 } = require(`${SERVER_ROOTFOLDER}/appsManagement`);
 const { handleData } = require(`${SERVER_ROOTFOLDER}/stdDataHandler`);
+const { authenticateJWT } = require(`${SERVER_ROOTFOLDER}/jwtAuthChecker`);
 
-ROUTER.post("/start", (req, res) => {
+ROUTER.post("/start", authenticateJWT, (req, res) => {
     const apps = JSON.parse(
         FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
             encoding: "utf-8",
