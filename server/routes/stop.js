@@ -18,6 +18,8 @@ ROUTER.post("/stop", authenticateJWT, async (req, res) => {
     if (!apps[app]) return res.sendStatus(404);
     if (launchedApp === LAUNCHED_APPS.length) return res.sendStatus(400);
 
+    if (apps[app].autoRestart) return res.sendStatus(400);
+
     switch (apps[app].closeProcess) {
         case "KILL":
             treeKill(LAUNCHED_APPS[launchedApp].child.pid);

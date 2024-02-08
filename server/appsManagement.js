@@ -1,6 +1,7 @@
 const { appStatus } = require(`${ROOTFOLDER}/conf`);
 
 const { handleData } = require(`${SERVER_ROOTFOLDER}/stdDataHandler`);
+const { startApp } = require(`${SERVER_ROOTFOLDER}/childManagement`);
 
 function getCurrentLocaleFormattedDate() {
     return new Date()
@@ -20,10 +21,12 @@ module.exports = {
         }
     },
 
-    finaliseExit(apps, app, launchedApp) {
+    finaliseExit(apps, app, launchedApp, _code) {
         LAUNCHED_APPS.splice(launchedApp, 1);
 
         apps[app].status = appStatus.KO;
+
+        if (_code && _code !== 0) apps[app].status = appStatus.UNKNOWN;
 
         FS.writeFileSync(
             `${SERVER_ROOTFOLDER}/data/apps.json`,
@@ -58,6 +61,13 @@ module.exports = {
                 `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             );
         }
+
+        if (
+            (apps[app].status === appStatus.KO ||
+                apps[app].status === appStatus.UNKNOWN) &&
+            apps[app].autoRestart
+        )
+            startApp(apps[app].name);
     },
 
     sendAppRCONCommand(launchedApp, rcon, command) {

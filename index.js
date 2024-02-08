@@ -1,5 +1,6 @@
 global.EXPRESS = require("express");
 global.FS = require("fs");
+global.CHILD = require("child_process");
 global.JWT = require("jsonwebtoken");
 
 const https = require("https");
@@ -35,6 +36,12 @@ if (!FS.existsSync(config.jwt.privateKey))
     throw new Error(
         `FATAL ERROR: ${config.jwt.privateKey}: no such file or directory.`
     );
+if (FS.existsSync(`${SERVER_ROOTFOLDER}/temp`))
+    FS.rmdirSync(`${SERVER_ROOTFOLDER}/temp`, {
+        recursive: true,
+        force: true,
+    });
+FS.mkdirSync(`${SERVER_ROOTFOLDER}/temp`);
 
 global.JWT_PRIVATE_KEY = FS.readFileSync(
     config.jwt.privateKey[0] == "/"
