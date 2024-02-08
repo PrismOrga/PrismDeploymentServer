@@ -28,7 +28,8 @@
         "jsonwebtoken": "^9.0.2",
         "morgan": "^1.10.0",
         "serve-favicon": "^2.5.0",
-        "serve-index": "^1.9.1"
+        "serve-index": "^1.9.1",
+        "tree-kill": "^1.2.2"
     },
     "devDependencies": {
         "nodemon": "^3.0.3"

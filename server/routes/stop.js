@@ -1,10 +1,10 @@
-const { sendAppRCONCommand } = require("../appsManagement");
-
 const {
     getAppIndexByName,
     finaliseExit,
 } = require(`${SERVER_ROOTFOLDER}/appsManagement`);
 const { authenticateJWT } = require(`${SERVER_ROOTFOLDER}/jwtAuthChecker`);
+
+const treeKill = require("tree-kill");
 
 ROUTER.post("/stop", authenticateJWT, async (req, res) => {
     const apps = JSON.parse(
@@ -20,7 +20,7 @@ ROUTER.post("/stop", authenticateJWT, async (req, res) => {
 
     switch (apps[app].closeProcess) {
         case "KILL":
-            process.kill(LAUNCHED_APPS[launchedApp].child.pid, "SIGTERM");
+            treeKill(LAUNCHED_APPS[launchedApp].child.pid);
             finaliseExit(apps, app, launchedApp);
             break;
         case "RCON":
