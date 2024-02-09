@@ -18,7 +18,7 @@ module.exports = {
     build: {
         auto: false,
         folders: ["client/src"],
-        exeptions: [
+        exceptions: [
             {
                 fileExtension: "html",
                 characters: [" ", ">"],

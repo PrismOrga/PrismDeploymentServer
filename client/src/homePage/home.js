@@ -27,7 +27,10 @@ function updateList() {
         type: "GET",
         url: "/apps",
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: function (data) {
             for (const app of data) {
@@ -99,7 +102,10 @@ function updateLog() {
         url: "/currentLog",
         data: { appName: appInConsole },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: function (data) {
             document.getElementById("console-lines").innerHTML =
@@ -114,7 +120,10 @@ function startApp(appName) {
         url: "/start",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: () => {
             if (shutdownings.includes(appName))
@@ -133,7 +142,10 @@ function stopApp(appName) {
         url: "/stop",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: () => {
             setTimeout(updateList(), 1000);
@@ -161,7 +173,10 @@ function switchAutoRestart(appName) {
         url: "/autorestart",
         data: { appName: appName },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: () => {
             setTimeout(updateList(), 1000);
@@ -204,7 +219,10 @@ function consoleCommand(command, _input, _consoleType, _appName) {
         url: consoleType,
         data: { appName: _appName || appInConsole, rconCommand: command },
         beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + getCookie("accessToken"));
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer " + getCookie("accessToken")
+            );
         },
         success: () => {
             setTimeout(updateLog(), 1000);
@@ -221,7 +239,7 @@ function logInOut() {
     if (!getCookie("accessToken")) {
         window.location.href = "/login";
     } else {
-        deleteCookie("accessToken")
+        deleteCookie("accessToken");
         window.location.reload();
     }
 }

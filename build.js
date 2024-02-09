@@ -38,7 +38,7 @@ switch (config.build.folders.length) {
         break;
     default:
         console.info(
-            `\x1B[33m[build] building ${config.build.folders.length} folder...\x1B[39m`
+            `\x1B[33m[build] building ${config.build.folders.length} folders...\x1B[39m`
         );
         break;
 }
@@ -57,25 +57,27 @@ for (const file of files) {
     for (let line = 0; line < newContentByLine.length; line++) {
         if (newContentByLine[line] === "") continue;
 
-        for (const exception of config.build.exeptions) {
-            if (
-                file.substring(file.length - exception.fileExtension.length) !==
-                exception.fileExtension
-            )
-                continue;
+        if (newContentByLine[line].slice(-1) === "\r") {
+            newContentByLine[line] = newContentByLine[line].slice(
+                0,
+                newContentByLine[line].length - 1
+            );
 
-            let pass = true;
-
-            for (const character of exception.characters) {
+            for (const exception of config.build.exceptions) {
                 if (
-                    newContent.substring(
-                        newContent.length - character.length
-                    ) === character
+                    file.substring(
+                        file.length - exception.fileExtension.length
+                    ) !== exception.fileExtension
                 )
-                    pass = false;
+                    continue;
+                if (
+                    exception.characters.includes(
+                        newContentByLine[line].slice(-1)
+                    )
+                )
+                    continue;
+                newContentByLine[line] += " ";
             }
-
-            if (pass) newContent += " ";
         }
 
         newContent += newContentByLine[line];
@@ -88,4 +90,15 @@ for (const file of files) {
 
     mkdirSync(`${__dirname}/build/${fileFolders}`, { recursive: true });
     writeFileSync(`${__dirname}/build/${file}`, newContent);
+}
+
+switch (config.build.folders.length) {
+    case 1:
+        console.info(`\x1B[32m[build] builded 1 folder with success!\x1B[39m`);
+        break;
+    default:
+        console.info(
+            `\x1B[32m[build] builded ${config.build.folders.length} folders with success!\x1B[39m`
+        );
+        break;
 }
