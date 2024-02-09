@@ -82,7 +82,7 @@ iframe {
 }
 
 .limiter {
-    width: 100%;
+    width: 100vw;
     margin: 0 auto;
     background: #c850c0;
     background: -webkit-linear-gradient(45deg, #4158d0, #c850c0);
@@ -107,6 +107,7 @@ iframe {
 
 #nav .nav-title {
     margin-left: 5px;
+    align-self: center;
 }
 
 #nav .nav-buttons {
@@ -139,7 +140,7 @@ iframe {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    padding: 33px 30px;
+    padding: 80px 30px 30px 30px;
 }
 
 .wrap-table100 {
@@ -180,19 +181,20 @@ table tbody {
     display: block;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 5px;
+    padding: 10px;
 }
 
 table tbody#console-lines {
+    height: 70vh;
     background: #000;
+    transition: 0.2s;
 }
 
 table tbody tr {
     height: 50px;
-}
-
-table tbody tr:last-child {
-    border: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 8px;
 }
 
 table tfoot {
@@ -248,6 +250,10 @@ table th input {
     font-weight: unset;
 }
 
+thead .column1 {
+    padding-left: 15px;
+}
+
 tbody tr:nth-child(even) {
     background-color: #f5f5f5;
 }
@@ -266,9 +272,12 @@ tbody td:hover {
     cursor: default;
 }
 
-.column1 {
-    width: 220px;
-    padding-left: 15px;
+#lines {
+    height: 70vh;
+}
+
+tbody .column1 {
+    padding-left: 0px;
 }
 
 .appcard {
@@ -334,95 +343,37 @@ tbody td:hover {
     margin-left: 5px;
 }
 
-@media screen and (max-width: 992px) {
-    /* table {
-        display: block;
-    }
-
-    table > *,
-    table tr,
-    table td,
-    table th {
-        display: block;
-    }
-
-    table thead {
-        display: none;
+@media screen and (max-width: 1199px) {
+    .wrap-table100 {
+        width: 695px;
     }
 
     table tbody tr {
-        height: auto;
-        padding: 37px 0;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 8px;
     }
 
-    table tbody tr td {
-        padding-left: 40% !important;
-        margin-bottom: 24px;
+    #console-command {
+        width: 550px;
     }
-
-    table tbody tr td:last-child {
-        margin-bottom: 0;
-    }
-
-    table tbody tr td:before {
-        font-family: OpenSans-Regular;
-        font-size: 14px;
-        color: #999;
-        line-height: 1.2;
-        font-weight: unset;
-        position: absolute;
-        width: 40%;
-        left: 30px;
-        top: 0;
-    }
-
-    table tbody tr td:nth-child(1):before {
-        content: "Date";
-    }
-
-    table tbody tr td:nth-child(2):before {
-        content: "Order ID";
-    }
-
-    table tbody tr td:nth-child(3):before {
-        content: "Name";
-    }
-
-    table tbody tr td:nth-child(4):before {
-        content: "Price";
-    }
-
-    table tbody tr td:nth-child(5):before {
-        content: "Quantity";
-    }
-
-    table tbody tr td:nth-child(6):before {
-        content: "Total";
-    }
-
-    .column4,
-    .column5,
-    .column6 {
-        text-align: left;
-    }
-
-    .column4,
-    .column5,
-    .column6,
-    .column1,
-    .column2,
-    .column3 {
-        width: 100%;
-    }
-
-    tbody tr {
-        font-size: 14px;
-    } */
 }
 
-@media (max-width: 576px) {
-    /* .container-table100 {
-        padding-left: 15px;
-        padding-right: 15px;
-    } */
+@media (max-width: 764px) {
+    .wrap-table100 {
+        width: 267px;
+    }
+
+    table tbody tr {
+        grid-template-columns: repeat(1, 1fr);
+        grid-gap: 8px;
+    }
+
+    table tbody#console-lines {
+        height: 40vh;
+        max-width: 267px;
+    }
+
+    #console-command {
+        width: 130px;
+    }
 }
