@@ -143,7 +143,7 @@ iframe {
 }
 
 .wrap-table100 {
-    width: 1170px;
+    width: 1125px;
 }
 
 table {
@@ -275,20 +275,21 @@ tbody td:hover {
     height: 120px;
     width: 100%;
     box-shadow: 0px 5px 5px #aaaaaa;
-    padding: 5%;
+    padding: 10px;
     border-radius: 15px;
     text-align: center;
+}
+
+.appcard .top {
+    display: flex;
+    justify-content: center;
 }
 
 .appbutton {
     background-color: transparent;
     font-size: 14pt;
     border-radius: 100%;
-}
-
-.appbutton svg {
-    top: 3px;
-    left: 2px;
+    margin-left: 2px;
 }
 
 .appbutton.disabled {
@@ -320,8 +321,21 @@ tbody td:hover {
     color: #ae00ff;
 }
 
+.appcard .desc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 5px 22px 5px;
+    height: -webkit-fill-available;
+}
+
+#console-command {
+    width: 955px;
+    margin-left: 5px;
+}
+
 @media screen and (max-width: 992px) {
-    table {
+    /* table {
         display: block;
     }
 
@@ -403,12 +417,12 @@ tbody td:hover {
 
     tbody tr {
         font-size: 14px;
-    }
+    } */
 }
 
 @media (max-width: 576px) {
-    .container-table100 {
+    /* .container-table100 {
         padding-left: 15px;
         padding-right: 15px;
-    }
+    } */
 }

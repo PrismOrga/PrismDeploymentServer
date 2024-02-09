@@ -37,7 +37,8 @@ function updateList() {
                 lines += `
                     <td class="column1" id="app-${app.name}">
                         <div class="appcard">
-                            ${app.name}`;
+                            <div class="top">
+                                ${app.name}`;
 
                 switch (app.status) {
                     case 1:
@@ -83,9 +84,10 @@ function updateList() {
                 </button>`;
 
                 lines += `
-                            <br />
-                            <br />
-                            ${app.description}
+                            </div>
+                            <p class="desc">
+                                ${app.description}
+                            </p>
                         </div>
                     </td>`;
             }
