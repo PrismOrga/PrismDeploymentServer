@@ -1,5 +1,5 @@
 {
-    "name": "prismdeployementserver",
+    "name": "prismdeploymentserver",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -11,14 +11,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/PrismOrga/PrismDeployementServer.git"
+        "url": "git+https://github.com/PrismOrga/PrismDeploementServer.git"
     },
     "author": "Ravriel",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/PrismOrga/PrismDeployementServer/issues"
+        "url": "https://github.com/PrismOrga/PrismDeploymentServer/issues"
     },
-    "homepage": "https://github.com/PrismOrga/PrismDeployementServer#readme",
+    "homepage": "https://github.com/PrismOrga/PrismDeploymentServer#readme",
     "dependencies": {
         "ansi-to-html": "^0.7.2",
         "body-parser": "^1.20.2",
