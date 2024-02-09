@@ -7,7 +7,7 @@ module.exports = {
         )
             FS.writeFileSync(
                 `${SERVER_ROOTFOLDER}/data/logs/${app.name}.console.log`,
-                "[39m[49m[22m[24m[27m"
+                "\x1B[39m\x1B[49m\x1B[22m\x1B[24m\x1B[27m"
             );
 
         let logFile = FS.readFileSync(

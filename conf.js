@@ -7,6 +7,7 @@ module.exports = {
     },
 
     ssl: {
+        bypass: false,
         certificate: "private/cert.pem",
         privateKey: "private/privkey.pem",
     },

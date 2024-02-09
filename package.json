@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "format": "prettier . --write",
-        "start": "nodemon index.js --ignore apps --ignore server/data --ignore build --ignore client --ignore build.js",
+        "dev": "nodemon index.js --ignore apps --ignore server/data --ignore build --ignore client --ignore build.js",
+        "start": "node index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "node build.js"
     },

@@ -85,35 +85,62 @@ APP.use(
 APP.use(favicon(`${CLIENT_ROOTFOLDER}/public/favicon.ico`));
 APP.use(ROUTER);
 
-const privateKey = FS.readFileSync(
-    config.ssl.privateKey
-        ? config.ssl.privateKey[0] == "/"
-            ? config.ssl.privateKey
-            : `${ROOTFOLDER}/${config.ssl.privateKey}`
-        : "none"
-);
-const certificate = FS.readFileSync(
-    config.ssl.certificate
-        ? config.ssl.certificate[0] == "/"
-            ? config.ssl.certificate
-            : `${ROOTFOLDER}/${config.ssl.certificate}`
-        : "none"
-);
+let privateKey;
+let certificate;
 
-if (!certificate || !privateKey) {
-    throw new Error("FATAL ERROR: NO CERTIFICATE/PRIVATE KEY FOUND");
-}
-
-const server = https
-    .createServer(
-        {
-            key: privateKey,
-            cert: certificate,
-        },
-        APP
-    )
-    .listen(port, () =>
-        console.log(`\x1B[36mServer app listening on port ${port}\x1B[39m`)
+if (!config.ssl.bypass) {
+    try {
+        privateKey = FS.readFileSync(
+            config.ssl.privateKey
+                ? config.ssl.privateKey[0] == "/"
+                    ? config.ssl.privateKey
+                    : `${ROOTFOLDER}/${config.ssl.privateKey}`
+                : "none"
+        );
+        certificate = FS.readFileSync(
+            config.ssl.certificate
+                ? config.ssl.certificate[0] == "/"
+                    ? config.ssl.certificate
+                    : `${ROOTFOLDER}/${config.ssl.certificate}`
+                : "none"
+        );
+    } catch (err) {
+        throw new Error(
+            "\x1B[5m\x1B[31mFATAL ERROR\x1B[25m: NO CERTIFICATE/PRIVATE KEY FOUND.\x1B[39m"
+        );
+    }
+} else
+    console.error(
+        "\x1B[33m[IGNORED] \x1B[5m\x1B[31mFATAL ERROR\x1B[25m: NO CERTIFICATE/PRIVATE KEY FOUND.\x1B[39m"
     );
 
-require("./routes");
+let server;
+
+try {
+    if (!config.ssl.bypass)
+        server = https
+            .createServer(
+                {
+                    key: privateKey,
+                    cert: certificate,
+                },
+                APP
+            )
+            .listen(port, () =>
+                console.log(
+                    `\x1B[36mServer app listening on port ${port}\x1B[39m`
+                )
+            );
+    else
+        server = APP.listen(port, () =>
+            console.log(`\x1B[36mServer app listening on port ${port}\x1B[39m`)
+        );
+
+    require("./routes");
+} catch (err) {
+    if (err.message.includes("PEM routines") && !config.ssl.bypass)
+        throw new Error(
+            "\x1B[5m\x1B[31mFATAL ERROR\x1B[25m: CERTIFICATE/PRIVATE KEY NOT VALID.\x1B[39m"
+        );
+    else throw err;
+}
