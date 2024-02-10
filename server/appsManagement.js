@@ -149,52 +149,47 @@ module.exports = {
     },
 
     startApp(appName) {
-        const apps = JSON.parse(
-            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-                encoding: "utf-8",
-            })
-        );
-        let app = module.exports.getAppIndexByName(apps, appName);
+        let app = module.exports.getAppIndexByName(APPS, appName);
         let appChild = null;
 
-        if (app === null || !apps[app]) return 404;
+        if (app === null || !APPS[app]) return 404;
         if (
-            apps[app].status === appStatus.OK ||
-            apps[app].status === appStatus.NOT_LAUNCHED
+            APPS[app].status === appStatus.OK ||
+            APPS[app].status === appStatus.NOT_LAUNCHED
         )
             return 400;
 
         appChild = CHILD.spawn(
-            apps[app].launchScript.command,
-            apps[app].launchScript.args,
+            APPS[app].launchScript.command,
+            APPS[app].launchScript.args,
             {
                 cwd:
-                    apps[app].location[0] == "/"
-                        ? `${apps[app].location}`
-                        : `${APPS_ROOTFOLDER}/${apps[app].location}`,
+                    APPS[app].location[0] == "/"
+                        ? `${APPS[app].location}`
+                        : `${APPS_ROOTFOLDER}/${APPS[app].location}`,
             }
         );
 
         LAUNCHED_APPS.push({
-            name: apps[app].name,
+            name: APPS[app].name,
             child: appChild,
         });
 
-        apps[app].status = appStatus.OK;
+        APPS[app].status = appStatus.OK;
 
         if (
             FS.existsSync(
-                `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
+                `${SERVER_ROOTFOLDER}/data/logs/${APPS[app].name}.console.log`
             )
         )
             FS.rmSync(
-                `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
+                `${SERVER_ROOTFOLDER}/data/logs/${APPS[app].name}.console.log`
             );
 
         appChild.stdout.on("data", (data) => {
             let launchedApp = module.exports.getAppIndexByName(
                 LAUNCHED_APPS,
-                apps[app].name
+                APPS[app].name
             );
 
             if (launchedApp === null) {
@@ -208,7 +203,7 @@ module.exports = {
         appChild.stderr.on("data", (data) => {
             let launchedApp = module.exports.getAppIndexByName(
                 LAUNCHED_APPS,
-                apps[app].name
+                APPS[app].name
             );
 
             if (launchedApp === null) {
@@ -222,7 +217,7 @@ module.exports = {
         appChild.on("exit", (code) => {
             let launchedApp = module.exports.getAppIndexByName(
                 LAUNCHED_APPS,
-                apps[app].name
+                APPS[app].name
             );
 
             if (launchedApp === null) {
@@ -230,44 +225,39 @@ module.exports = {
                 return;
             }
 
-            module.exports.finaliseExit(apps, app, launchedApp, code);
+            module.exports.finaliseExit(APPS, app, launchedApp, code);
         });
 
         FS.writeFileSync(
             `${SERVER_ROOTFOLDER}/data/apps.json`,
-            JSON.stringify(apps)
+            JSON.stringify(APPS)
         );
 
         return 200;
     },
 
     stopApp(appName) {
-        const apps = JSON.parse(
-            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-                encoding: "utf-8",
-            })
-        );
-        let app = module.exports.getAppIndexByName(apps, appName);
+        let app = module.exports.getAppIndexByName(APPS, appName);
         let launchedApp = module.exports.getAppIndexByName(
             LAUNCHED_APPS,
-            apps[app].name
+            APPS[app].name
         );
 
-        if (app === null || !apps[app]) return { status: 404 };
+        if (app === null || !APPS[app]) return { status: 404 };
         if (launchedApp === null || !LAUNCHED_APPS[launchedApp])
             return { status: 400 };
 
-        if (apps[app].autoRestart) return { status: 400 };
+        if (APPS[app].autoRestart) return { status: 400 };
 
-        switch (apps[app].closeProcess) {
+        switch (APPS[app].closeProcess) {
             case "KILL":
                 treeKill(LAUNCHED_APPS[launchedApp].child.pid);
-                module.exports.finaliseExit(apps, app, launchedApp);
+                module.exports.finaliseExit(APPS, app, launchedApp);
                 break;
             case "RCON":
                 return {
                     status: 403,
-                    json: { closeCommand: apps[app].rcon.closeCommand },
+                    json: { closeCommand: APPS[app].rcon.closeCommand },
                 };
             default:
                 console.log("TODO: CUSTOM EXIT");
@@ -277,24 +267,19 @@ module.exports = {
     },
 
     async rconCommandHandler(appName, rconCommand) {
-        const apps = JSON.parse(
-            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-                encoding: "utf-8",
-            })
-        );
-        const app = module.exports.getAppIndexByName(apps, appName);
+        const app = module.exports.getAppIndexByName(APPS, appName);
         let launchedApp = module.exports.getAppIndexByName(
             LAUNCHED_APPS,
-            apps[app].name
+            APPS[app].name
         );
 
-        if (app === null || !apps[app]) return 404;
+        if (app === null || !APPS[app]) return 404;
         if (launchedApp === null || !LAUNCHED_APPS[launchedApp])
             return 400;
 
         const commandExitCode = await module.exports.sendAppRCONCommand(
-            apps[app].name,
-            apps[app].rcon,
+            APPS[app].name,
+            APPS[app].rcon,
             rconCommand
         );
 
@@ -309,20 +294,14 @@ module.exports = {
     },
 
     setAllRunningAppsStatus(status) {
-        const apps = JSON.parse(
-            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-                encoding: "utf-8",
-            })
-        );
-
-        for (let app of apps) {
+        for (let app of APPS) {
             if (app.status === appStatus.OK)
                 app = module.exports.setAppStatus(app, status);
         }
 
         FS.writeFileSync(
             `${SERVER_ROOTFOLDER}/data/apps.json`,
-            JSON.stringify(apps)
+            JSON.stringify(APPS)
         );
     },
 };

@@ -24,14 +24,9 @@ ROUTER.get("/login", (req, res) => {
  */
 
 ROUTER.get("/apps", authenticateJWT, (req, res) => {
-    let apps = JSON.parse(
-        FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-            encoding: "utf-8",
-        })
-    );
     let allowedApps = [];
 
-    for (const app of apps) {
+    for (const app of APPS) {
         if (req.user.access.apps.includes(app.name) || req.user.access.apps.includes("*")) allowedApps.push(app);
     }
     res.json(allowedApps);

@@ -56,25 +56,25 @@ global.JWT_PRIVATE_KEY = FS.readFileSync(
         : `${ROOTFOLDER}/${config.jwt.privateKey}`
 );
 
-let apps = JSON.parse(
+global.APPS = JSON.parse(
     FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
         encoding: "utf-8",
     })
 );
 
-for (let app = 0; app < apps.length; app++) {
+for (let app = 0; app < APPS.length; app++) {
     let appPath =
-        apps[app].location[0] == "/"
-            ? `${apps[app].location}`
-            : `${APPS_ROOTFOLDER}/${apps[app].location}`;
+        APPS[app].location[0] == "/"
+            ? `${APPS[app].location}`
+            : `${APPS_ROOTFOLDER}/${APPS[app].location}`;
 
     if (!FS.existsSync(appPath)) {
-        apps[app].status = -1;
+        APPS[app].status = -1;
         console.error(`ERROR: ${appPath}: no such file or directory.`);
     }
 }
 
-FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, JSON.stringify(apps));
+FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, JSON.stringify(APPS));
 
 global.APP = EXPRESS();
 global.ROUTER = EXPRESS.Router();
@@ -189,21 +189,15 @@ for (const exception of exceptions) {
 async function closePDS() {
     SHUTDOWN = 1;
 
+    FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, JSON.stringify(APPS));
     server.close();
-
     console.log(
         `\x1B[93mSending closing signals and commands to apps...\x1B[39m`
     );
 
     const promises = [];
 
-    apps = JSON.parse(
-        FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
-            encoding: "utf-8",
-        })
-    );
-
-    for (const app of apps) {
+    for (const app of APPS) {
         if (app.status === config.appStatus.OK) {
             const { json } = stopApp(app.name);
 
