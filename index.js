@@ -166,6 +166,7 @@ io.use(authenticateSocketJWT).on("connection", (socket) => {
     console.log(`${socket.user.username} connected!`);
 
     socket.on("disconnect", function () {
+        socket.disconnect();
         console.log(`${socket.user.username} disconnected!`);
     });
 

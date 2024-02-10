@@ -1,5 +1,8 @@
 let appInConsole = null;
 let isConsoleOpen = false;
+let isSocketConnected = false;
+let isInfoBusy = false;
+let infoIndex = 0;
 
 $(document).ready(function () {
     $("input").on("keydown", function search(e) {
@@ -17,6 +20,47 @@ $(document).ready(function () {
     socketUpdateLogs();
 });
 
+function displayInfoState(message, state, _displayTime) {
+    if (isInfoBusy) return;
+
+    const info = document.getElementById("info");
+
+    info.hidden = false;
+    info.style.opacity = 0;
+    setTimeout(() => (info.style.opacity = 1), 10);
+
+    switch (state) {
+        case 0:
+            info.classList.value = "success";
+            break;
+        case 84:
+            info.classList.value = "error";
+            break;
+        default:
+            info.classList.value = "";
+            break;
+    }
+
+    info.innerHTML = message.replaceAll("\n", "<br />");
+
+    if (_displayTime) {
+        infoIndex++;
+        setTimeout(() => hideInfoState(true), _displayTime);
+    }
+}
+
+function hideInfoState(_wasTimed) {
+    if (_wasTimed) infoIndex--;
+
+    if (infoIndex || isInfoBusy) return;
+
+    const info = document.getElementById("info");
+
+    info.style.opacity = 1;
+    info.style.opacity = 0;
+    setTimeout(() => (info.hidden = true), 210);
+}
+
 function startApp(appName) {
     $.ajax({
         type: "POST",
@@ -30,7 +74,13 @@ function startApp(appName) {
         },
         success: () => {},
         error: function (err) {
-            throw new Error(err);
+            displayInfoState(
+                `An error occured while trying to start ${appName}.\nYou may not be authorized to do so.`,
+                84,
+                5000
+            );
+
+            console.error(new Error(err));
         },
     });
 }
@@ -48,7 +98,13 @@ function stopApp(appName) {
         },
         success: () => {},
         error: function (err) {
-            throw new Error(err);
+            displayInfoState(
+                `An error occured while trying to stop ${appName}.\nYou may not be authorized to do so.`,
+                84,
+                5000
+            );
+
+            console.error(new Error(err));
         },
     });
 }
@@ -66,7 +122,13 @@ function switchAutoRestart(appName) {
         },
         success: () => {},
         error: function (err) {
-            throw new Error(err);
+            displayInfoState(
+                `An error occured while trying to switch autorestart state of ${appName}.\nYou may not be authorized to do so.`,
+                84,
+                5000
+            );
+
+            console.error(new Error(err));
         },
     });
 }
@@ -98,7 +160,7 @@ function consoleCommand(command, _input, _consoleType, _appName) {
 
     return $.ajax({
         type: "POST",
-        url: consoleType,
+        url: consoleType.toLowerCase(),
         data: { appName: _appName || appInConsole, rconCommand: command },
         beforeSend: function (xhr) {
             xhr.setRequestHeader(
@@ -108,6 +170,14 @@ function consoleCommand(command, _input, _consoleType, _appName) {
         },
         success: () => {},
         error: function (err) {
+            displayInfoState(
+                `An error occured while sending command to ${
+                    _appName || appInConsole
+                }'s ${consoleType} console.\nYou may not be authorized to do so.`,
+                84,
+                5000
+            );
+
             console.error(new Error(err));
         },
     });

@@ -147,6 +147,38 @@ iframe {
     width: 1125px;
 }
 
+.table100 {
+    display: flex;
+    flex-direction: column;
+}
+
+.table100 #info {
+    position: absolute;
+    align-self: center;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0px 15px;
+    padding: 10px 20px;
+    border: transparent solid 2px;
+    border-radius: 5px;
+    background-color: transparent;
+    text-align: center;
+    font-weight: bold;
+    line-height: 1.4;
+    transition: 0.2s;
+    z-index: 1;
+}
+
+.table100 #info.error {
+    border: #ff0000 solid 2px;
+    background-color: #ff0000bf;
+}
+
+.table100 #info.success {
+    border: #00ff26 solid 2px;
+    background-color: #00ff26bf;
+}
+
 table {
     border-spacing: 1;
     border-collapse: collapse;

@@ -1,6 +1,51 @@
 const socket = io({ auth: { token: getCookie("accessToken") } });
 
+socket.io.on("connect", () => {
+    console.log("connect", isInfoBusy);
+    isSocketConnected = true;
+    isInfoBusy = false;
+    hideInfoState();
+
+    setTimeout(() => displayInfoState("Connected to PDS!", 0, 1000), 300);
+});
+
+socket.io.on("disconnect", () => {
+    isSocketConnected = false;
+    isInfoBusy = false;
+    displayInfoState(
+        "The socket used to communicate with the PDS was disconnected by it.\nIt may be due to server crash or overload.\nYou need to refresh this page after a short amount of time.",
+        84
+    );
+    isInfoBusy = true;
+});
+
+socket.io.on("reconnect_error", () => {
+    isSocketConnected = false;
+    isInfoBusy = false;
+    displayInfoState(
+        "The socket used to communicate with the PDS lost connection with it.\nIt may be due to server crash or overload, trying to reconnect...\nYou can stay on this page for now, or refresh it after a short amount of time.",
+        84
+    );
+    isInfoBusy = true;
+});
+
+socket.io.on("reconnect_failed", () => {
+    isSocketConnected = false;
+    isInfoBusy = false;
+    displayInfoState(
+        "The socket used to communicate with the PDS was disconnected by it.\nIt may be due to server crash or overload.\nYou need to refresh this page after a short amount of time.",
+        84
+    );
+    isInfoBusy = true;
+});
+
 socket.io.on("reconnect", () => {
+    isSocketConnected = true;
+    isInfoBusy = false;
+    hideInfoState();
+
+    setTimeout(() => displayInfoState("Connected to PDS!", 0, 1000), 300);
+
     socketUpdateApps();
     socketUpdateLogs();
 });
@@ -16,6 +61,11 @@ socket.on("logsUpdated!", () => {
 function socketUpdateApps() {
     socket.emit("apps", (data) => {
         let lines = "";
+
+        hideInfoState();
+
+        if (data.empty)
+            setTimeout(() => displayInfoState("Nothing to show here."), 300);
 
         for (const app of data) {
             lines += `
