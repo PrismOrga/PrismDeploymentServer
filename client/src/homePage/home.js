@@ -141,7 +141,7 @@ function startApp(appName) {
         success: () => {
             if (shutdownings.includes(appName))
                 shutdownings.splice(shutdownings.indexOf(appName), 1);
-            setTimeout(updateList(), 1000);
+            setTimeout(updateList(), 100);
         },
         error: function (err) {
             throw new Error(err);
@@ -161,7 +161,7 @@ function stopApp(appName) {
             );
         },
         success: () => {
-            setTimeout(updateList(), 1000);
+            setTimeout(updateList(), 100);
         },
         error: function (err) {
             if (err.responseText) {
@@ -192,7 +192,7 @@ function switchAutoRestart(appName) {
             );
         },
         success: () => {
-            setTimeout(updateList(), 1000);
+            setTimeout(updateList(), 100);
         },
         error: function (err) {
             throw new Error(err);
@@ -238,11 +238,18 @@ function consoleCommand(command, _input, _consoleType, _appName) {
             );
         },
         success: () => {
-            setTimeout(updateLog(), 1000);
+            setTimeout(updateLog(), 100);
+
+            if (!_input) setTimeout(updateList(), 100);
+
             return true;
         },
         error: function (err) {
             console.error(new Error(err));
+            setTimeout(updateLog(), 100);
+
+            if (!_input) setTimeout(updateList(), 100);
+
             return false;
         },
     });

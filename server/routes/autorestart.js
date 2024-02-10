@@ -11,7 +11,7 @@ ROUTER.post("/autorestart", authenticateJWT, (req, res) => {
     );
     let app = getAppIndexByName(apps, req.body.appName);
 
-    if (!apps[app]) return res.sendStatus(404);
+    if (app === null || !apps[app]) return res.sendStatus(404);
     if (
         apps[app].status === appStatus.OK ||
         apps[app].status === appStatus.NOT_LAUNCHED

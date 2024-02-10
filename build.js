@@ -31,13 +31,13 @@ mkdirSync(`build`);
 
 switch (config.build.folders.length) {
     case 0:
-        console.info(`\x1B[33m[build] no folder to build\x1B[39m`);
+        console.log(`\x1B[33m[build] no folder to build\x1B[39m`);
         break;
     case 1:
-        console.info(`\x1B[33m[build] building 1 folder...\x1B[39m`);
+        console.log(`\x1B[33m[build] building 1 folder...\x1B[39m`);
         break;
     default:
-        console.info(
+        console.log(
             `\x1B[33m[build] building ${config.build.folders.length} folders...\x1B[39m`
         );
         break;
@@ -94,10 +94,10 @@ for (const file of files) {
 
 switch (config.build.folders.length) {
     case 1:
-        console.info(`\x1B[32m[build] builded 1 folder with success!\x1B[39m`);
+        console.log(`\x1B[32m[build] builded 1 folder with success!\x1B[39m`);
         break;
     default:
-        console.info(
+        console.log(
             `\x1B[32m[build] builded ${config.build.folders.length} folders with success!\x1B[39m`
         );
         break;

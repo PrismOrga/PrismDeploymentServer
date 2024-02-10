@@ -2,6 +2,8 @@ const { appStatus } = require(`${ROOTFOLDER}/conf`);
 
 const { handleData } = require(`${SERVER_ROOTFOLDER}/stdDataHandler`);
 
+const treeKill = require("tree-kill");
+
 function getCurrentLocaleFormattedDate() {
     return new Date()
         .toLocaleString()
@@ -18,6 +20,8 @@ module.exports = {
                 return app;
             }
         }
+
+        return null;
     },
 
     finaliseExit(apps, app, launchedApp, _code) {
@@ -69,7 +73,7 @@ module.exports = {
             startApp(apps[app].name);
     },
 
-    sendAppRCONCommand(launchedApp, rcon, command) {
+    sendAppRCONCommand(appName, rcon, command) {
         let currentCommandFilename = getCurrentLocaleFormattedDate();
         let rconChild = null;
 
@@ -93,14 +97,44 @@ module.exports = {
         ]);
 
         rconChild.stdout.on("data", (data) => {
-            handleData(LAUNCHED_APPS[launchedApp], `RCON: ${data}`);
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                appName
+            );
+
+            if (launchedApp === null) {
+                treeKill(rconChild.pid);
+                return null;
+            }
+
+            handleData(LAUNCHED_APPS[launchedApp], data);
         });
 
         rconChild.stderr.on("data", (data) => {
-            handleData(LAUNCHED_APPS[launchedApp], `RCON: ${data}`);
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                appName
+            );
+
+            if (launchedApp === null) {
+                treeKill(rconChild.pid);
+                return null;
+            }
+
+            handleData(LAUNCHED_APPS[launchedApp], data);
         });
 
         rconChild.on("error", (error) => {
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                appName
+            );
+
+            if (launchedApp === null) {
+                treeKill(rconChild.pid);
+                return;
+            }
+
             handleData(
                 LAUNCHED_APPS[launchedApp],
                 `RCON: Couldn't send RCON command:\n${error}`
@@ -123,7 +157,7 @@ module.exports = {
         let app = module.exports.getAppIndexByName(apps, appName);
         let appChild = null;
 
-        if (!apps[app]) return 404;
+        if (app === null || !apps[app]) return 404;
         if (
             apps[app].status === appStatus.OK ||
             apps[app].status === appStatus.NOT_LAUNCHED
@@ -148,8 +182,6 @@ module.exports = {
 
         apps[app].status = appStatus.OK;
 
-        let launchedApp = module.exports.getAppIndexByName(LAUNCHED_APPS, apps[app].name);
-
         if (
             FS.existsSync(
                 `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
@@ -160,14 +192,44 @@ module.exports = {
             );
 
         appChild.stdout.on("data", (data) => {
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                apps[app].name
+            );
+
+            if (launchedApp === null) {
+                treeKill(appChild.pid);
+                return;
+            }
+
             handleData(LAUNCHED_APPS[launchedApp], data);
         });
 
         appChild.stderr.on("data", (data) => {
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                apps[app].name
+            );
+
+            if (launchedApp === null) {
+                treeKill(appChild.pid);
+                return;
+            }
+
             handleData(LAUNCHED_APPS[launchedApp], data);
         });
 
         appChild.on("exit", (code) => {
+            let launchedApp = module.exports.getAppIndexByName(
+                LAUNCHED_APPS,
+                apps[app].name
+            );
+
+            if (launchedApp === null) {
+                treeKill(appChild.pid);
+                return;
+            }
+
             module.exports.finaliseExit(apps, app, launchedApp, code);
         });
 
@@ -177,5 +239,90 @@ module.exports = {
         );
 
         return 200;
+    },
+
+    stopApp(appName) {
+        const apps = JSON.parse(
+            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
+                encoding: "utf-8",
+            })
+        );
+        let app = module.exports.getAppIndexByName(apps, appName);
+        let launchedApp = module.exports.getAppIndexByName(
+            LAUNCHED_APPS,
+            apps[app].name
+        );
+
+        if (app === null || !apps[app]) return { status: 404 };
+        if (launchedApp === null || !LAUNCHED_APPS[launchedApp])
+            return { status: 400 };
+
+        if (apps[app].autoRestart) return { status: 400 };
+
+        switch (apps[app].closeProcess) {
+            case "KILL":
+                treeKill(LAUNCHED_APPS[launchedApp].child.pid);
+                module.exports.finaliseExit(apps, app, launchedApp);
+                break;
+            case "RCON":
+                return {
+                    status: 403,
+                    json: { closeCommand: apps[app].rcon.closeCommand },
+                };
+            default:
+                console.log("TODO: CUSTOM EXIT");
+        }
+
+        return { status: 200 };
+    },
+
+    async rconCommandHandler(appName, rconCommand) {
+        const apps = JSON.parse(
+            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
+                encoding: "utf-8",
+            })
+        );
+        const app = module.exports.getAppIndexByName(apps, appName);
+        let launchedApp = module.exports.getAppIndexByName(
+            LAUNCHED_APPS,
+            apps[app].name
+        );
+
+        if (app === null || !apps[app]) return 404;
+        if (launchedApp === null || !LAUNCHED_APPS[launchedApp])
+            return 400;
+
+        const commandExitCode = await module.exports.sendAppRCONCommand(
+            apps[app].name,
+            apps[app].rcon,
+            rconCommand
+        );
+
+        if (commandExitCode === 0) return 200;
+
+        return 500;
+    },
+
+    setAppStatus(app, status) {
+        app.status = status;
+        return app;
+    },
+
+    setAllRunningAppsStatus(status) {
+        const apps = JSON.parse(
+            FS.readFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, {
+                encoding: "utf-8",
+            })
+        );
+
+        for (let app of apps) {
+            if (app.status === appStatus.OK)
+                app = module.exports.setAppStatus(app, status);
+        }
+
+        FS.writeFileSync(
+            `${SERVER_ROOTFOLDER}/data/apps.json`,
+            JSON.stringify(apps)
+        );
     },
 };
