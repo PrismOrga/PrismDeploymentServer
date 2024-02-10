@@ -35,6 +35,7 @@ module.exports = {
             `${SERVER_ROOTFOLDER}/data/apps.json`,
             JSON.stringify(apps)
         );
+        PDS_EMITTER.emit("appsUpdated!");
 
         if (
             FS.existsSync(
@@ -63,6 +64,7 @@ module.exports = {
             FS.rmSync(
                 `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             );
+            PDS_EMITTER.emit("logsUpdated!");
         }
 
         if (
@@ -181,10 +183,12 @@ module.exports = {
             FS.existsSync(
                 `${SERVER_ROOTFOLDER}/data/logs/${APPS[app].name}.console.log`
             )
-        )
+        ) {
             FS.rmSync(
                 `${SERVER_ROOTFOLDER}/data/logs/${APPS[app].name}.console.log`
             );
+            PDS_EMITTER.emit("logsUpdated!");
+        }
 
         appChild.stdout.on("data", (data) => {
             let launchedApp = module.exports.getAppIndexByName(
@@ -232,11 +236,12 @@ module.exports = {
             `${SERVER_ROOTFOLDER}/data/apps.json`,
             JSON.stringify(APPS)
         );
+        PDS_EMITTER.emit("appsUpdated!");
 
         return 200;
     },
 
-    stopApp(appName) {
+    async stopApp(appName) {
         let app = module.exports.getAppIndexByName(APPS, appName);
         let launchedApp = module.exports.getAppIndexByName(
             LAUNCHED_APPS,
@@ -255,10 +260,20 @@ module.exports = {
                 module.exports.finaliseExit(APPS, app, launchedApp);
                 break;
             case "RCON":
-                return {
-                    status: 403,
-                    json: { closeCommand: APPS[app].rcon.closeCommand },
-                };
+                let rconStatus = await module.exports.rconCommandHandler(
+                    APPS[app].name,
+                    APPS[app].rcon.closeCommand
+                );
+
+                if (rconStatus === 200 && APPS[app].status === appStatus.OK) {
+                    APPS[app].status = appStatus.TO_KO;
+                    FS.writeFileSync(
+                        `${SERVER_ROOTFOLDER}/data/apps.json`,
+                        JSON.stringify(APPS)
+                    );
+                    PDS_EMITTER.emit("appsUpdated!");
+                }
+                break;
             default:
                 console.log("TODO: CUSTOM EXIT");
         }
@@ -274,8 +289,7 @@ module.exports = {
         );
 
         if (app === null || !APPS[app]) return 404;
-        if (launchedApp === null || !LAUNCHED_APPS[launchedApp])
-            return 400;
+        if (launchedApp === null || !LAUNCHED_APPS[launchedApp]) return 400;
 
         const commandExitCode = await module.exports.sendAppRCONCommand(
             APPS[app].name,
@@ -290,6 +304,7 @@ module.exports = {
 
     setAppStatus(app, status) {
         app.status = status;
+        PDS_EMITTER.emit("appsUpdated!");
         return app;
     },
 

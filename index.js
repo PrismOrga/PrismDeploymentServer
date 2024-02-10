@@ -8,7 +8,10 @@ const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const favicon = require("serve-favicon");
+const Convert = require("ansi-to-html");
+const EventEmitter = require("node:events");
 
+global.PDS_EMITTER = new EventEmitter();
 global.ROOTFOLDER = __dirname;
 global.SHUTDOWN = 0;
 
@@ -27,6 +30,9 @@ const {
     stopApp,
     rconCommandHandler,
 } = require(`${SERVER_ROOTFOLDER}/appsManagement`);
+const {
+    authenticateSocketJWT,
+} = require(`${SERVER_ROOTFOLDER}/jwtAuthChecker`);
 
 if (!FS.existsSync(`${APPS_ROOTFOLDER}`)) FS.mkdirSync(`${APPS_ROOTFOLDER}`);
 if (!FS.existsSync(`${SERVER_ROOTFOLDER}/data`))
@@ -80,7 +86,7 @@ global.APP = EXPRESS();
 global.ROUTER = EXPRESS.Router();
 global.LAUNCHED_APPS = new Array();
 
-APP.use(morgan("combined"));
+// APP.use(morgan("combined"));
 APP.use(cors());
 APP.use(bodyParser.json());
 APP.use(
@@ -154,14 +160,76 @@ try {
     else throw err;
 }
 
+const io = require("socket.io")(server);
+
+io.use(authenticateSocketJWT).on("connection", (socket) => {
+    console.log(`${socket.user.username} connected!`);
+
+    socket.on("disconnect", function () {
+        console.log(`${socket.user.username} disconnected!`);
+    });
+
+    socket.on("apps", (callback) => {
+        let allowedApps = [];
+
+        for (const app of APPS) {
+            if (
+                socket.user.access.apps.includes(app.name) ||
+                socket.user.access.apps.includes("*")
+            )
+                allowedApps.push(app);
+        }
+
+        callback(allowedApps);
+    });
+
+    socket.on("currentLog", (args, callback) => {
+        const convert = new Convert();
+
+        if (
+            !FS.existsSync(
+                `${SERVER_ROOTFOLDER}/data/logs/${args.appName}.console.log`
+            )
+        )
+            callback({ lines: "" });
+        else
+            callback({
+                lines: convert.toHtml(
+                    `${FS.readFileSync(
+                        `${SERVER_ROOTFOLDER}/data/logs/${args.appName}.console.log`
+                    )}`
+                ),
+            });
+    });
+
+    PDS_EMITTER.on("appsUpdated!", () => {
+        socket.emit("appsUpdated!");
+    });
+
+    PDS_EMITTER.on("logsUpdated!", () => {
+        socket.emit("logsUpdated!");
+    });
+});
+
 const signals = ["SIGINT", "SIGTERM", "SIGQUIT"];
 
 for (const signal of signals) {
     process.on(signal, () => {
-        console.log(
-            `\n\x1B[93m${signal} signal received: closing PDS and all its apps...\x1B[39m`
-        );
-        closePDS();
+        if (SHUTDOWN === 0) {
+            console.log(
+                `\n\x1B[93m${signal} signal received: closing PDS and all its apps...\x1B[39m`
+            );
+            closePDS();
+        }
+        if (SHUTDOWN !== 0 && signal === "SIGTERM") {
+            console.error(
+                `\x1B[91m${signal} signal received: crash during closing happened! Please report error to devs!\x1B[39m`
+            );
+            if (SHUTDOWN !== -1) {
+                SHUTDOWN = -1;
+                process.kill(process.pid);
+            }
+        }
     });
 }
 
@@ -169,19 +237,21 @@ const exceptions = ["uncaughtException", "unhandledRejection"];
 
 for (const exception of exceptions) {
     process.on(exception, (err) => {
-        if (!SHUTDOWN) {
+        if (SHUTDOWN === 0) {
             console.error(err);
             console.log(
                 `\n\x1B[93m${err.message}: closing PDS and all its apps...\x1B[39m`
             );
             closePDS();
         } else {
-            SHUTDOWN = -1;
             console.error(`\n${err}`);
             console.error(
                 `\x1B[91m${err.message}: crash during closing happened! Please report error to devs!\x1B[39m`
             );
-            process.kill(process.pid);
+            if (SHUTDOWN !== -1) {
+                SHUTDOWN = -1;
+                process.kill(process.pid);
+            }
         }
     });
 }
@@ -189,28 +259,31 @@ for (const exception of exceptions) {
 async function closePDS() {
     SHUTDOWN = 1;
 
-    FS.writeFileSync(`${SERVER_ROOTFOLDER}/data/apps.json`, JSON.stringify(APPS));
+    FS.writeFileSync(
+        `${SERVER_ROOTFOLDER}/data/apps.json`,
+        JSON.stringify(APPS)
+    );
+
+    while (io.sockets.sockets.size !== 0) {
+        try {
+            io.close();
+        } catch (err) {}
+    }
+
+    try {
+        io.close();
+    } catch (err) {}
+
     server.close();
     console.log(
         `\x1B[93mSending closing signals and commands to apps...\x1B[39m`
     );
 
-    const promises = [];
-
     for (const app of APPS) {
-        if (app.status === config.appStatus.OK) {
-            const { json } = stopApp(app.name);
-
-            if (json)
-                promises.push(
-                    rconCommandHandler(app.name, app.rcon.closeCommand)
-                );
-        }
+        if (app.status === config.appStatus.OK) stopApp(app.name);
     }
 
-    await Promise.all(promises);
-
-    console.log("\x1B[92mAll signals sent with success!\x1B[39m");
+    console.log("\x1B[92mAll signals and commands sent with success!\x1B[39m");
     console.log(
         `\x1B[93mWaiting for async apps to shutdown and closing PDS...\x1B[39m`
     );

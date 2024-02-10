@@ -19,5 +19,6 @@ module.exports = {
             `${SERVER_ROOTFOLDER}/data/logs/${app.name}.console.log`,
             logFile
         );
+        PDS_EMITTER.emit("logsUpdated!");
     },
 };

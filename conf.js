@@ -1,6 +1,7 @@
 module.exports = {
     appStatus: {
         OK: 1,
+        TO_KO: 83,
         KO: 84,
         UNKNOWN: -1,
         NOT_LAUNCHED: 0,
@@ -17,7 +18,7 @@ module.exports = {
     },
 
     build: {
-        auto: false,
+        auto: true,
         folders: ["client/src"],
         exceptions: [
             {
