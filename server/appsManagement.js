@@ -289,7 +289,7 @@ module.exports = {
         );
 
         if (app === null || !APPS[app]) return 404;
-        if (launchedApp === null || !LAUNCHED_APPS[launchedApp]) return 400;
+        if (launchedApp === null || !LAUNCHED_APPS[launchedApp] || !APPS[app].rcon) return 400;
 
         const commandExitCode = await module.exports.sendAppRCONCommand(
             APPS[app].name,
