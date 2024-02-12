@@ -46,7 +46,7 @@ module.exports = {
                 `${SERVER_ROOTFOLDER}/data/logs/${apps[app].name}.console.log`
             );
 
-            logFile += `Exited with code: ${0}`;
+            logFile += `Exited with code: ${_code || 0}`;
             if (
                 !FS.existsSync(
                     `${SERVER_ROOTFOLDER}/data/logs/_old/${apps[app].name}`
