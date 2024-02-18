@@ -46,7 +46,7 @@ You can find the main configuration file at the following path starting from the
 - `port: number`: the port which the PDS will use on your internet connection. `[OPTIONAL]`
 - `appStatus`: the constants used by the PDS server to set the status of the apps (do not touch it unless you know what you are doing).
 - `ssl`:
-  - `bypass: bool`: inform PDS if it might ignore SSL missing/invalid certificate and private key. IF SET TO `true` IT MIGHT CREATE SECUTIRY ISSUES!
+  - `bypass: bool`: inform PDS if it might ignore SSL missing/invalid certificate and private key. IF SET TO `true` IT MIGHT CREATE SECURITY ISSUES!
   - `certificate: string`: the path of your SSL certificate (can start with a `/` for absolute path).
   - `privateKey: string`: the path of your SSL private key (can start with a `/` for absolute path).
 - `jwt`:
