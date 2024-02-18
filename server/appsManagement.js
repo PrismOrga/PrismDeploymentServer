@@ -72,7 +72,7 @@ module.exports = {
                 apps[app].status === appStatus.UNKNOWN) &&
             apps[app].autoRestart
         )
-            startApp(apps[app].name);
+            module.exports.startApp(apps[app].name);
     },
 
     sendAppRCONCommand(appName, rcon, command) {
@@ -289,7 +289,12 @@ module.exports = {
         );
 
         if (app === null || !APPS[app]) return 404;
-        if (launchedApp === null || !LAUNCHED_APPS[launchedApp] || !APPS[app].rcon) return 400;
+        if (
+            launchedApp === null ||
+            !LAUNCHED_APPS[launchedApp] ||
+            !APPS[app].rcon
+        )
+            return 400;
 
         const commandExitCode = await module.exports.sendAppRCONCommand(
             APPS[app].name,
