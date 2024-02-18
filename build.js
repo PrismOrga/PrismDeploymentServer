@@ -85,6 +85,8 @@ for (const file of files) {
 
     let fileFolders = file.split("/");
 
+    if (fileFolders[0] === file) fileFolders = file.split("\\");
+
     fileFolders.pop();
     fileFolders = fileFolders.join("/");
 
