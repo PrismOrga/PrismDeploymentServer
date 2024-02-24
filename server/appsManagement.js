@@ -145,6 +145,9 @@ module.exports = {
 
         return new Promise((resolve) => {
             rconChild.on("close", (code) => {
+                FS.rmSync(
+                    `${SERVER_ROOTFOLDER}/temp/${currentCommandFilename}`
+                );
                 resolve(code);
             });
         });
