@@ -41,14 +41,58 @@ router.post("/start", (req, res) => {
         apps[app].launchScript.command,
         apps[app].launchScript.args,
         {
-            cwd: `${__dirname}/${apps[app].location}`,
+            cwd: apps[app].location[0] == "/" ? `${apps[app].location}` : `${__dirname}/${apps[app].location}`,
         }
     );
+
+    appChild.stdout.on("data", (data) => {
+        if (
+            !fs.existsSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            )
+        )
+            fs.writeFileSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`,
+                ""
+            );
+
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += data;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`,
+            logFile
+        );
+    });
+
+    appChild.stderr.on("data", (data) => {
+        if (
+            !fs.existsSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`
+            )
+        )
+            fs.writeFileSync(
+                `${__dirname}/data/logs/${apps[app].name}.console.log`,
+                ""
+            );
+
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += data;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`,
+            logFile
+        );
+    });
 
     appChild.on("exit", (code) => {
         launchedApps.splice(launchedApp, 1);
 
-        apps[app].status = KO;
+        apps[app].status = UNKNOWN;
 
         fs.writeFileSync(`${__dirname}/data/apps.json`, JSON.stringify(apps));
     });
@@ -86,13 +130,34 @@ router.post("/stop", (req, res) => {
     }
     if (launchedApp === launchedApps.length) return res.sendStatus(400);
 
-    process.kill(launchedApps[launchedApp].child.pid);
+    switch (launchedApps[launchedApp].closeProcess) {
+        case "KILL":
+            process.kill(launchedApps[launchedApp].child.pid, "SIGTERM");
+            break;
+        case "RCON":
+            console.info("TODO: RCON EXIT");
+            break;
+        default:
+            console.info("TODO: CUSTOM EXIT");
+    }
 
     launchedApps.splice(launchedApp, 1);
 
     apps[app].status = KO;
 
     fs.writeFileSync(`${__dirname}/data/apps.json`, JSON.stringify(apps));
+
+    if (fs.existsSync(`${__dirname}/data/logs/${apps[app].name}.console.log`)) {
+        let logFile = fs.readFileSync(
+            `${__dirname}/data/logs/${apps[app].name}.console.log`
+        );
+
+        logFile += `Exited with code: ${0}`;
+        fs.writeFileSync(
+            `${__dirname}/data/logs/_old/${apps[app].name}.console.log`,
+            logFile
+        );
+    }
 
     return res.sendStatus(200);
 });

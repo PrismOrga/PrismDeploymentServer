@@ -219,6 +219,11 @@ tbody td:hover {
     border-radius: 100%;
 }
 
+.appbutton svg {
+    top: 3px;
+    left: 2px;
+}
+
 .appbutton.disabled {
     color: #707070;
 }
